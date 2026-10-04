@@ -578,5 +578,95 @@
     ],
     "urlSourceFields": [],
     "price": "$0.002 / Page"
+  },
+  {
+    "name": "website_screenshot",
+    "actor": "webdatatools~website-screenshot",
+    "title": "Website Screenshot Generator",
+    "description": "Generate full-page or viewport screenshots of websites in PNG or JPEG format. Fast, reliable screenshots with customizable viewport size, wait time, and element hiding. Billed to your own Apify account: ~$0.002 per screenshot (Apify free-plan price, lower on paid plans).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "urls": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^https?://.+"
+          },
+          "minItems": 1,
+          "description": "Website URLs — Array of website URLs to screenshot, e.g. ['https://example.com', 'https://google.com'] Example: [\"https://example.com\"]."
+        },
+        "fullPage": {
+          "type": "boolean",
+          "default": false,
+          "description": "Full Page Screenshot — Capture entire page height (clipped at 20,000 px to avoid giant images). Set false to capture only the viewport."
+        },
+        "format": {
+          "type": "string",
+          "enum": [
+            "png",
+            "jpeg"
+          ],
+          "default": "png",
+          "description": "Image Format — Output image format: 'png' or 'jpeg'"
+        },
+        "quality": {
+          "type": "integer",
+          "default": 80,
+          "minimum": 1,
+          "maximum": 100,
+          "description": "JPEG Quality — JPEG compression quality (1-100). Only used when format is 'jpeg'."
+        },
+        "viewportWidth": {
+          "type": "integer",
+          "default": 1280,
+          "minimum": 320,
+          "maximum": 3840,
+          "description": "Viewport Width — Browser viewport width in pixels"
+        },
+        "viewportHeight": {
+          "type": "integer",
+          "default": 800,
+          "minimum": 240,
+          "maximum": 2160,
+          "description": "Viewport Height — Browser viewport height in pixels"
+        },
+        "waitUntil": {
+          "type": "string",
+          "enum": [
+            "load",
+            "domcontentloaded",
+            "networkidle"
+          ],
+          "default": "load",
+          "description": "Wait Until Event — Page load event to wait for before taking screenshot"
+        },
+        "waitMs": {
+          "type": "integer",
+          "default": 1000,
+          "minimum": 0,
+          "maximum": 30000,
+          "description": "Additional Wait Time — Additional time to wait after page load event (milliseconds)"
+        },
+        "hideSelectors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "Hide CSS Selectors — CSS selectors to hide before taking screenshot (e.g., ['.modal', '#cookiebanner'])"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "urls"
+      ]
+    },
+    "arrayFields": [
+      "urls",
+      "hideSelectors"
+    ],
+    "urlSourceFields": [],
+    "price": "$0.002 / screenshot"
   }
 ]
