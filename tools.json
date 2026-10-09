@@ -564,17 +564,57 @@
           "type": "boolean",
           "default": true,
           "description": "Trim whitespace — Keep this on to collapse runs of whitespace and trim the ends of extracted text and attribute values. Turning it off returns text and attr values exactly as found in the page."
+        },
+        "itemSelector": {
+          "type": "string",
+          "description": "Item selector (list pages) — Optional. A CSS selector for repeated items, e.g. \"div.product-card\". When set, each matching element becomes one object in the row's \"items\" array, and every selector above is searched only inside that element. The row is still one per page."
+        },
+        "maxItemsPerPage": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000,
+          "description": "Max items per page — Optional. Most items to return per page in item mode (default 200). \"itemCount\" always reports the full number."
+        },
+        "linkSelector": {
+          "type": "string",
+          "description": "Link selector (follow links) — Optional. A CSS selector for links to follow, e.g. \"a.next\" for pagination or \"a.product-link\" for detail pages. Every followed page is extracted the same way and billed as one page. Capped by Max pages."
+        },
+        "sitemapUrls": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Sitemap URLs — Optional. Sitemap or sitemap-index URLs, e.g. https://example.com/sitemap.xml. Every page URL listed (gzip and nested indexes handled) is added to the run, capped by Max pages."
+        },
+        "urlPattern": {
+          "type": "string",
+          "description": "URL pattern — Optional regular expression. Only followed links and sitemap URLs matching it are processed, e.g. \"/products/\"."
+        },
+        "maxPages": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100000,
+          "description": "Max pages — Optional. Total page cap when following links or reading sitemaps (default 100). Plain URL lists are not capped by this."
+        },
+        "sameDomainOnly": {
+          "type": "boolean",
+          "description": "Stay on the same domain — Only follow links on the same host as the page they were found on (default on)."
+        },
+        "includeMetadata": {
+          "type": "boolean",
+          "description": "Include page metadata — Add a \"metadata\" object to each row: title, description, canonical URL, language, Open Graph tags and parsed JSON-LD (schema.org) blocks."
         }
       },
       "additionalProperties": false,
       "required": [
-        "selectors",
-        "urls"
+        "urls",
+        "selectors"
       ]
     },
     "arrayFields": [
       "urls",
-      "selectors"
+      "selectors",
+      "sitemapUrls"
     ],
     "urlSourceFields": [],
     "price": "$0.002 / Page"
