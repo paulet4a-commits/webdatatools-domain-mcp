@@ -530,7 +530,7 @@
     "name": "css_selector_extractor",
     "actor": "webdatatools~css-selector-extractor",
     "title": "Web Scraper — CSS Selector & Data Extractor",
-    "description": "Web Scraper pulls any CSS selector off any page, returning text, HTML, attributes or match counts — one row per URL, no browser required. Billed to your own Apify account: ~$0.002 per Page (Apify free-plan price, lower on paid plans).",
+    "description": "Web Scraper pulls any CSS selector off any page, returning text, HTML, attributes, tables or counts — one row per page (lists: an items array), no browser. Billed to your own Apify account: ~$0.002 per Page (Apify free-plan price, lower on paid plans).",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -539,13 +539,13 @@
           "items": {
             "type": "string"
           },
-          "description": "URLs — Enter one URL per row to fetch and run the selectors against, e.g. https://example.com. Each URL gets exactly one result row, even if the fetch fails. Example: [\"https://example.com\"].",
+          "description": "URLs — Enter one URL per row to fetch and run the selectors against, e.g. https://example.com. Each page fetched gets exactly one result row, even if the fetch fails (in item mode the row holds an items array). Rows are saved as pages finish; if the run timeout comes first, the run stops early and still ends SUCCEEDED with every page done so far. Example: [\"https://example.com\"].",
           "minItems": 1
         },
         "selectors": {
           "type": "array",
           "items": {},
-          "description": "Selectors — Enter the fields to extract as a JSON array of {\"name\", \"selector\", \"type\"} objects. \"type\" is one of text, html, attr or count; an \"attr\" entry also needs \"attribute\" (e.g. {\"name\":\"canonicalUrl\",\"selector\":\"link[rel='canonical']\",\"type\":\"attr\",\"attribute\":\"href\"}). Capped at 25 entries per run. Example: [{\"name\":\"title\",\"selector\":\"h1\",\"type\":\"text\"}].",
+          "description": "Selectors — Enter the fields to extract as a JSON array of {\"name\", \"selector\", \"type\"} objects. \"type\" is text, html, attr, count or table; \"attr\" also needs \"attribute\" (e.g. {\"name\":\"canonicalUrl\",\"selector\":\"link[rel='canonical']\",\"type\":\"attr\",\"attribute\":\"href\"}). \"table\" returns the matched <table> as an array of row objects keyed by its header row. Capped at 25 entries per run. Example: [{\"name\":\"title\",\"selector\":\"h1\",\"type\":\"text\"}].",
           "minItems": 1
         },
         "firstMatchOnly": {
@@ -590,6 +590,14 @@
           "type": "string",
           "description": "URL pattern — Optional regular expression. Only followed links and sitemap URLs matching it are processed, e.g. \"/products/\"."
         },
+        "urlTemplate": {
+          "type": "string",
+          "description": "URL template (pagination) — Optional. A URL with a {page} placeholder, e.g. \"https://books.toscrape.com/catalogue/page-{page}.html\". One URL per page number in Page range is added to the run (up to 10,000), after the URLs above. Each page is one result."
+        },
+        "pageRange": {
+          "type": "object",
+          "description": "Page range — Used with URL template: {\"from\": 1, \"to\": 10} and optionally \"step\" (e.g. 20 for offset-style URLs like ?start={page}). Inclusive; from defaults to 1. Example: {\"from\":1,\"to\":3}."
+        },
         "maxPages": {
           "type": "integer",
           "minimum": 1,
@@ -603,6 +611,15 @@
         "includeMetadata": {
           "type": "boolean",
           "description": "Include page metadata — Add a \"metadata\" object to each row: title, description, canonical URL, language, Open Graph tags and parsed JSON-LD (schema.org) blocks."
+        },
+        "headers": {
+          "type": "object",
+          "description": "Request headers — Optional. Extra HTTP headers sent with every page request, e.g. {\"Accept-Language\": \"de-DE\", \"Authorization\": \"Bearer …\"}. A \"User-Agent\" here replaces the default one. Values are never written to the log."
+        },
+        "cookies": {
+          "type": "array",
+          "items": {},
+          "description": "Cookies — Optional. Cookies sent with every page request, as [\"name=value\", …] or the [{\"name\": …, \"value\": …}] list a browser cookie-export extension produces (domain and path are ignored). Values are never written to the log; a raw Cookie header can also go in Request headers."
         }
       },
       "additionalProperties": false,
@@ -614,7 +631,8 @@
     "arrayFields": [
       "urls",
       "selectors",
-      "sitemapUrls"
+      "sitemapUrls",
+      "cookies"
     ],
     "urlSourceFields": [],
     "price": "$0.002 / Page"
