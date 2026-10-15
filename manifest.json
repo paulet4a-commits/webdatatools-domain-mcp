@@ -1,0 +1,703 @@
+{
+  "manifest_version": "0.3",
+  "name": "webdatatools-domain-mcp",
+  "display_name": "WebDataTools Domain & website intelligence",
+  "version": "0.1.0",
+  "description": "Domain & website intelligence tools for AI agents over MCP, backed by WebDataTools' Apify Actors. Uses your own Apify API token — billed to you, not us.",
+  "long_description": "12 domain & website intelligence tools. WHOIS/RDAP, DNS and e-mail security (SPF, DKIM, DMARC), TLS and security headers, subdomains, tech stack, contacts, SEO, Core Web Vitals, sitemaps and Wayback page diffs for any domain.\n\nEvery tool call runs a WebDataTools Actor on your own Apify account (get a free token with monthly free credit at https://console.apify.com/settings/integrations), so usage is billed to you, never to the server author. The price per result is in each tool description.",
+  "author": {
+    "name": "WebDataTools",
+    "url": "https://apify.com/webdatatools"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/paulet4a-commits/webdatatools-domain-mcp"
+  },
+  "homepage": "https://apify.com/webdatatools",
+  "support": "https://github.com/paulet4a-commits/webdatatools-domain-mcp/issues",
+  "license": "MIT",
+  "keywords": [
+    "mcp",
+    "mcp-server",
+    "model-context-protocol",
+    "apify",
+    "ai-agent",
+    "whois",
+    "rdap",
+    "dns",
+    "dmarc",
+    "spf",
+    "security-audit",
+    "subdomains",
+    "tech-stack",
+    "seo",
+    "domain-intelligence"
+  ],
+  "server": {
+    "type": "node",
+    "entry_point": "bin/cli.js",
+    "mcp_config": {
+      "command": "node",
+      "args": [
+        "${__dirname}/bin/cli.js"
+      ],
+      "env": {
+        "APIFY_TOKEN": "${user_config.apify_token}"
+      }
+    }
+  },
+  "compatibility": {
+    "platforms": [
+      "darwin",
+      "win32",
+      "linux"
+    ],
+    "runtimes": {
+      "node": ">=18.0.0"
+    }
+  },
+  "user_config": {
+    "apify_token": {
+      "type": "string",
+      "title": "Apify API token",
+      "description": "Your personal Apify API token. Get a free one (with monthly free credit) at https://console.apify.com/settings/integrations. Every tool call is billed to this account, never to the server author.",
+      "sensitive": true,
+      "required": true
+    }
+  },
+  "tools": [
+    {
+      "name": "contact_extractor",
+      "description": "Email Extractor finds every e-mail address, phone number and social profile on a website — one clean row per domain, ready for outreach. Billed to your own Apify account: ~$0.01 per result (Apify free-plan price, lower on paid plans).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "startUrls": {
+            "type": "array",
+            "items": {},
+            "description": "Websites — Enter the websites to crawl, one row is returned per website. Use bare domains or full URLs, e.g. example.com or https://example.com. Example: [{\"url\":\"https://apify.com\"}].",
+            "minItems": 1
+          },
+          "maxPagesPerDomain": {
+            "type": "integer",
+            "default": 30,
+            "minimum": 1,
+            "maximum": 1000,
+            "description": "Max pages per website — Enter how many pages to crawl per website before stopping, e.g. 30. Contact details usually live on the home, about and contact pages, so 20-50 is plenty."
+          },
+          "maxDepth": {
+            "type": "integer",
+            "default": 2,
+            "minimum": 0,
+            "maximum": 5,
+            "description": "Max link depth — Enter how many links deep to follow from the start URL, e.g. 2. Set 0 to crawl only the start page."
+          },
+          "followSubdomains": {
+            "type": "boolean",
+            "default": false,
+            "description": "Follow subdomains — Turn this on to also crawl subdomains such as blog.example.com and shop.example.com, not just the main hostname."
+          },
+          "extractEmails": {
+            "type": "boolean",
+            "default": true,
+            "description": "Extract e-mail addresses — Turn this on to collect e-mail addresses from mailto: links and page source, filtered through a false-positive blocklist, e.g. info@example.com."
+          },
+          "extractPhones": {
+            "type": "boolean",
+            "default": true,
+            "description": "Extract phone numbers — Turn this on to collect phone numbers from tel: links only, e.g. +902120000000, which avoids the false positives you get from scraping raw text."
+          },
+          "extractSocials": {
+            "type": "boolean",
+            "default": true,
+            "description": "Extract social profiles — Turn this on to collect social profile links, e.g. https://linkedin.com/company/example, covering LinkedIn, X/Twitter, Instagram, Facebook, YouTube, TikTok, GitHub, Telegram and WhatsApp."
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "startUrls"
+        ]
+      }
+    },
+    {
+      "name": "tech_stack_detector",
+      "description": "Tech Stack Detector finds the CMS, e-commerce platform, analytics, ad pixels, chat widget and payment provider any website runs — one row per domain. Billed to your own Apify account: ~$0.02 per result (Apify free-plan price, lower on paid plans).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "startUrls": {
+            "type": "array",
+            "items": {},
+            "description": "Websites — Enter the websites to fingerprint, one row is returned per website. Use bare domains or full URLs, e.g. example.com or https://example.com. Example: [{\"url\":\"https://apify.com\"}].",
+            "minItems": 1
+          },
+          "maxPagesPerDomain": {
+            "type": "integer",
+            "default": 3,
+            "minimum": 1,
+            "maximum": 50,
+            "description": "Max pages per website — Enter how many pages to fetch per website, e.g. 3. The homepage exposes most of the stack; 2-4 pages also catches checkout and marketing scripts that only load on shop or contact pages."
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "cms",
+                "ecommerce",
+                "analytics",
+                "advertising",
+                "emailMarketing",
+                "chat",
+                "payments",
+                "frameworks",
+                "cookieConsent",
+                "cdn",
+                "server"
+              ],
+              "enumTitles": [
+                "CMS",
+                "E-commerce platform",
+                "Analytics",
+                "Advertising & retargeting pixels",
+                "E-mail & marketing automation",
+                "Chat & support widgets",
+                "Payment providers",
+                "Front-end frameworks",
+                "Cookie consent",
+                "CDN & hosting",
+                "Web server"
+              ]
+            },
+            "default": [],
+            "description": "Technology categories — Select which technology categories to detect, e.g. cms, ecommerce. Leave empty to detect everything; narrowing the list makes runs cheaper and keeps the output to the columns you care about. Options: cms = CMS; ecommerce = E-commerce platform; analytics = Analytics; advertising = Advertising & retargeting pixels; emailMarketing = E-mail & marketing automation; chat = Chat & support widgets; payments = Payment providers; frameworks = Front-end frameworks; cookieConsent = Cookie consent; cdn = CDN & hosting; server = Web server."
+          },
+          "followSubdomains": {
+            "type": "boolean",
+            "default": false,
+            "description": "Follow subdomains — Turn this on to also inspect subdomains such as shop.example.com, which often run a different platform than the main site."
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "startUrls"
+        ]
+      }
+    },
+    {
+      "name": "dns_email_security_checker",
+      "description": "Domain DNS & Email Security Checker returns SPF, DKIM, DMARC, MX, MTA-STS, BIMI, CAA, nameservers, registrar and domain age for every domain you give it — one scored row per domain. Billed to your own Apify account: ~$0.005 per result (Apify free-plan price, lower on paid plans).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "domains": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Domains — Enter the domains to check, one row is returned per domain, e.g. apify.com. Full URLs and www. prefixes are accepted and stripped automatically (https://www.apify.com/store becomes apify.com), so you can paste a list straight out of your CRM. Example: [\"apify.com\"].",
+            "minItems": 1
+          },
+          "checkDkim": {
+            "type": "boolean",
+            "default": true,
+            "description": "Check DKIM selectors — Keep this on to probe common DKIM selectors such as google and selector1. DKIM has no discoverable record name, so it can only be found by guessing selectors; turning this off makes each domain 16 DNS queries cheaper but drops 15 points from the score."
+          },
+          "dkimSelectors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "default": [
+              "google",
+              "selector1",
+              "selector2",
+              "default",
+              "k1",
+              "k2",
+              "mail",
+              "dkim",
+              "s1",
+              "s2",
+              "mandrill",
+              "smtp",
+              "zoho",
+              "protonmail",
+              "everlytickey1",
+              "mxvault"
+            ],
+            "description": "DKIM selectors to probe — Enter the DKIM selectors to try, e.g. google, selector1, k1. Each one is looked up as <selector>._domainkey.<domain>. Leave the defaults unless you know the provider your targets use; a shorter list means fewer DNS queries per domain."
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "domains"
+        ]
+      }
+    },
+    {
+      "name": "domain_security_audit",
+      "description": "Domain Security Audit checks TLS certificate validity, HSTS/CSP and other HTTP security headers, the redirect chain and robots.txt/llms.txt AI-bot rules for any list of domains — one scored, graded row per domain. Billed to your own Apify account: ~$0.005 per result (Apify free-plan price, lower on paid plans).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "domains": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Domains — Enter the domains to audit, one row is returned per domain, e.g. apify.com. Full URLs and www. prefixes are accepted and stripped automatically (https://www.apify.com/store becomes apify.com), so you can paste a list straight out of your CRM. Example: [\"apify.com\"].",
+            "minItems": 1
+          },
+          "checkTls": {
+            "type": "boolean",
+            "default": true,
+            "description": "Check TLS certificate — Connect on port 443 and read the peer certificate's validity dates, issuer, subject, SAN count, days until expiry and whether the chain is trusted. Turn off to skip this and save a few seconds per domain."
+          },
+          "checkHeaders": {
+            "type": "boolean",
+            "default": true,
+            "description": "Check HTTP security headers — Read HSTS, Content-Security-Policy, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy, Server, X-Powered-By, Cache-Control and cookie flags from the final response after redirects."
+          },
+          "followRedirects": {
+            "type": "boolean",
+            "default": true,
+            "description": "Follow redirect chain — Start at http://<domain>/ and follow Location headers manually (up to 10 hops) to find the final URL, whether it upgrades to HTTPS and whether it adds or drops the www. prefix. Turn off to check the headers of http://<domain>/ directly with no redirect following."
+          },
+          "checkRobots": {
+            "type": "boolean",
+            "default": true,
+            "description": "Check robots.txt and llms.txt — Fetch /robots.txt (disallow-all detection, sitemap count, and which AI crawlers such as GPTBot, ClaudeBot and Google-Extended are blocked) and /llms.txt (presence, title, size)."
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "domains"
+        ]
+      }
+    },
+    {
+      "name": "subdomain_finder",
+      "description": "Subdomain Finder enumerates every subdomain of a domain from Certificate Transparency logs (crt.sh, Cert Spotter) and resolves each one — one row per subdomain, no proxies needed. Billed to your own Apify account: ~$0.0005 per result (Apify free-plan price, lower on paid plans).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "domains": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Domains — Enter the root domains to enumerate subdomains for, e.g. apify.com. Bare domains and full URLs both work — https://www.apify.com/pricing is reduced to apify.com. One row is returned per subdomain found. Example: [\"apify.com\"].",
+            "minItems": 1
+          },
+          "resolveDns": {
+            "type": "boolean",
+            "default": true,
+            "description": "Resolve DNS — Turn this on to look up an A record for every subdomain found, so you can tell live hosts from dead certificate records. Costs one extra DNS query per subdomain and fills in resolves, ipv4 and cname. Turn it off for a pure certificate list."
+          },
+          "includeWildcards": {
+            "type": "boolean",
+            "default": false,
+            "description": "Include wildcard names — Turn this on to also return wildcard certificate names such as *.example.com. They cannot be resolved, so they are excluded by default."
+          },
+          "maxSubdomainsPerDomain": {
+            "type": "integer",
+            "default": 500,
+            "minimum": 1,
+            "maximum": 10000,
+            "description": "Max subdomains per domain — Enter the maximum number of subdomains to return per domain, e.g. 500. Big brands have thousands of certificate names; when the cap is hit the subdomains with the most recently issued certificates are kept."
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "domains"
+        ]
+      }
+    },
+    {
+      "name": "core_web_vitals_audit",
+      "description": "Bulk Core Web Vitals and PageSpeed audit: Lighthouse performance, SEO and accessibility scores, LCP, CLS, INP, TBT and the top fixes — one row per URL and device. Billed to your own Apify account: ~$0.005 per result (Apify free-plan price, lower on paid plans).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "urls": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "URLs to audit — Enter the page URLs to audit, one per row, e.g. https://apify.com. Each URL returns one row per device strategy. Audit the exact URL you care about (a landing page, not only the homepage) - PageSpeed Insights follows redirects but scores the page it lands on. Example: [\"https://apify.com\"].",
+            "minItems": 1
+          },
+          "strategy": {
+            "type": "string",
+            "enum": [
+              "mobile",
+              "desktop",
+              "both"
+            ],
+            "default": "mobile",
+            "description": "Device strategy — Select the device Lighthouse should emulate, e.g. mobile. Google ranks on mobile, so audit mobile unless you specifically need desktop numbers. Choose 'Both' to get one row per device (two billable rows per URL). Options: mobile = Mobile (recommended); desktop = Desktop; both = Both (2 rows per URL)."
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "performance",
+                "accessibility",
+                "best-practices",
+                "seo"
+              ],
+              "enumTitles": [
+                "Performance",
+                "Accessibility",
+                "Best practices",
+                "SEO"
+              ]
+            },
+            "default": [
+              "performance"
+            ],
+            "description": "Lighthouse categories — Select which Lighthouse categories to score, e.g. performance, seo. Every extra category makes the Google request slower; performance alone already returns all Core Web Vitals and the optimisation opportunities. Options: performance = Performance; accessibility = Accessibility; best-practices = Best practices; seo = SEO."
+          },
+          "locale": {
+            "type": "string",
+            "default": "en",
+            "description": "Report locale — Enter the language for Lighthouse titles and display values, e.g. en, de or tr. Only the wording of titles changes, never the metrics."
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "urls"
+        ]
+      }
+    },
+    {
+      "name": "seo_page_audit",
+      "description": "On-Page SEO Audit checks title, meta description, headings, images, links, Open Graph, Twitter Card and Schema.org data for any list of URLs — one scored row per page. Billed to your own Apify account: ~$0.002 per result (Apify free-plan price, lower on paid plans).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "urls": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "URLs — Enter the page URLs to audit, one row is returned per URL, e.g. https://apify.com. A bare domain like apify.com is accepted and gets https:// added automatically. Example: [\"https://apify.com\"].",
+            "minItems": 1
+          },
+          "checkLinks": {
+            "type": "boolean",
+            "default": false,
+            "description": "Check internal links for broken ones — Keep this off for a fast audit. Turn it on to HEAD-check up to 50 internal links per page and list the broken ones in the `brokenLinks` field — this is slower and adds extra requests per page."
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "urls"
+        ]
+      }
+    },
+    {
+      "name": "sitemap_extractor",
+      "description": "Sitemap URL extractor that reads robots.txt, sitemap indexes, .xml.gz and plain-text sitemaps and returns one row per URL with lastmod, changefreq, priority — plus a new/removed diff between runs. Billed to your own Apify account: ~$0.0002 per result (Apify free-plan price, lower on paid plans).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "sources": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Sitemaps or domains — Enter the sitemaps to read, or just the domains, e.g. https://apify.com or https://www.allbirds.com/sitemap.xml. For a bare domain the Actor reads the Sitemap: lines of /robots.txt and falls back to /sitemap.xml, /sitemap_index.xml, /sitemap-index.xml, /sitemap.xml.gz and /sitemap.txt. Sitemap indexes are followed into their child sitemaps automatically. Example: [\"https://apify.com\"].",
+            "minItems": 1
+          },
+          "maxUrlsPerSource": {
+            "type": "integer",
+            "default": 1000,
+            "minimum": 1,
+            "maximum": 200000,
+            "description": "Max URLs per source — Enter how many URLs to keep per source, e.g. 5000. Counted across all child sitemaps of an index, so a 200,000-URL e-commerce site stops as soon as the cap is reached. Each URL is one billed dataset row."
+          },
+          "urlFilter": {
+            "type": "string",
+            "default": "",
+            "description": "URL filter (regex) — Optional JavaScript regular expression; only URLs matching it are kept, e.g. /products/ for a Shopify catalogue or \\.pdf$ for documents. Leave empty to keep every URL. The pattern is matched against the full URL and is case-sensitive, so write [Pp]roducts when you need both cases."
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "list",
+              "diff"
+            ],
+            "default": "list",
+            "description": "Mode — Choose list to dump every URL found right now, or diff to compare this run with the previous one and label each URL new, unchanged or removed. Diff mode needs at least two runs of the same source to be useful. Options: list = list — every URL in the sitemap; diff = diff — new / removed / unchanged since the last run."
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "sources"
+        ]
+      }
+    },
+    {
+      "name": "wayback_page_diff",
+      "description": "Wayback Machine Snapshot & Page Change Tracker lists every Internet Archive capture of a URL and diffs the visible text of the oldest vs. newest snapshot in range — one scored change row per URL, or a full snapshot list. Billed to your own Apify account: ~$0.003 per result (Apify free-plan price, lower on paid plans).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "urls": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "URLs — Enter the page URLs to look up in the Wayback Machine, e.g. https://apify.com/pricing. Bare domains are accepted too. One row (diff mode) or up to Max snapshots per URL rows (snapshots mode) comes back per URL. Example: [\"https://apify.com/pricing\"].",
+            "minItems": 1
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "diff",
+              "snapshots"
+            ],
+            "default": "diff",
+            "description": "Mode — \"Diff\" compares the oldest and newest archived snapshot in range and returns what changed. \"Snapshots\" lists every capture Wayback has for the URL, newest first, with no comparison. Options: diff = Diff (compare oldest vs. newest capture); snapshots = Snapshots (list all captures)."
+          },
+          "from": {
+            "type": "string",
+            "description": "From date — Only consider captures on or after this date, e.g. 2023-01-01 or 20230101. Leave empty for no lower bound."
+          },
+          "to": {
+            "type": "string",
+            "description": "To date — Only consider captures on or before this date, e.g. 2024-06-30 or 20240630. Leave empty for no upper bound."
+          },
+          "maxSnapshots": {
+            "type": "integer",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 1000,
+            "description": "Max snapshots per URL — Snapshots mode only: the most captures returned per URL (newest first). Ignored in diff mode, which always emits exactly one row per URL."
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "urls"
+        ]
+      }
+    },
+    {
+      "name": "domain_whois_rdap",
+      "description": "Bulk domain WHOIS lookup via the official RDAP protocol — registrar, registration/expiry dates, domain age, nameservers, DNSSEC and status codes for any domain, no API key, no rate limits. Billed to your own Apify account: ~$0.003 per Domain (Apify free-plan price, lower on paid plans).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "domains": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Domains — Enter one domain per line, e.g. github.com. A full URL such as https://github.com/apify also works — the path, protocol and www. prefix are stripped automatically. Example: [\"github.com\"].",
+            "minItems": 1
+          },
+          "includeNameservers": {
+            "type": "boolean",
+            "default": true,
+            "description": "Include nameservers — Keep this on to list every nameserver RDAP returns for the domain in the nameservers field. Turn it off to skip that field and leave it null, which slightly shrinks the output."
+          },
+          "includeRawEvents": {
+            "type": "boolean",
+            "default": false,
+            "description": "Include raw RDAP events — Keep this on to also store the raw, unparsed RDAP events array (registration, last-changed, expiration, transfer, etc.) alongside the parsed date fields, useful when a registry publishes an event type this Actor does not map to a named field."
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "domains"
+        ]
+      }
+    },
+    {
+      "name": "css_selector_extractor",
+      "description": "Web Scraper pulls any CSS selector off any page, returning text, HTML, attributes, tables or counts — one row per page (lists: an items array), no browser. Billed to your own Apify account: ~$0.002 per Page (Apify free-plan price, lower on paid plans).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "urls": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "URLs — Enter one URL per row to fetch and run the selectors against, e.g. https://example.com. Each page fetched gets exactly one result row, even if the fetch fails (in item mode the row holds an items array). Rows are saved as pages finish; if the run timeout comes first, the run stops early and still ends SUCCEEDED with every page done so far. Example: [\"https://example.com\"].",
+            "minItems": 1
+          },
+          "selectors": {
+            "type": "array",
+            "items": {},
+            "description": "Selectors — Enter the fields to extract as a JSON array of {\"name\", \"selector\", \"type\"} objects. \"type\" is text, html, attr, count or table; \"attr\" also needs \"attribute\" (e.g. {\"name\":\"canonicalUrl\",\"selector\":\"link[rel='canonical']\",\"type\":\"attr\",\"attribute\":\"href\"}). \"table\" returns the matched <table> as an array of row objects keyed by its header row. Capped at 25 entries per run. Example: [{\"name\":\"title\",\"selector\":\"h1\",\"type\":\"text\"}].",
+            "minItems": 1
+          },
+          "firstMatchOnly": {
+            "type": "boolean",
+            "default": true,
+            "description": "First match only — Keep this on to return only the first element each selector matches. Turn it off to return every match (up to Max matches per selector) as an array."
+          },
+          "maxMatchesPerSelector": {
+            "type": "integer",
+            "default": 20,
+            "minimum": 1,
+            "maximum": 500,
+            "description": "Max matches per selector — Enter the most matches to return for one selector when First match only is off, e.g. 20. Does not limit the reported match count, only how many values are returned."
+          },
+          "trimWhitespace": {
+            "type": "boolean",
+            "default": true,
+            "description": "Trim whitespace — Keep this on to collapse runs of whitespace and trim the ends of extracted text and attribute values. Turning it off returns text and attr values exactly as found in the page."
+          },
+          "itemSelector": {
+            "type": "string",
+            "description": "Item selector (list pages) — Optional. A CSS selector for repeated items, e.g. \"div.product-card\". When set, each matching element becomes one object in the row's \"items\" array, and every selector above is searched only inside that element. The row is still one per page."
+          },
+          "maxItemsPerPage": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1000,
+            "description": "Max items per page — Optional. Most items to return per page in item mode (default 200). \"itemCount\" always reports the full number."
+          },
+          "linkSelector": {
+            "type": "string",
+            "description": "Link selector (follow links) — Optional. A CSS selector for links to follow, e.g. \"a.next\" for pagination or \"a.product-link\" for detail pages. Every followed page is extracted the same way and billed as one page. Capped by Max pages."
+          },
+          "sitemapUrls": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Sitemap URLs — Optional. Sitemap or sitemap-index URLs, e.g. https://example.com/sitemap.xml. Every page URL listed (gzip and nested indexes handled) is added to the run, capped by Max pages."
+          },
+          "urlPattern": {
+            "type": "string",
+            "description": "URL pattern — Optional regular expression. Only followed links and sitemap URLs matching it are processed, e.g. \"/products/\"."
+          },
+          "urlTemplate": {
+            "type": "string",
+            "description": "URL template (pagination) — Optional. A URL with a {page} placeholder, e.g. \"https://books.toscrape.com/catalogue/page-{page}.html\". One URL per page number in Page range is added to the run (up to 10,000), after the URLs above. Each page is one result."
+          },
+          "pageRange": {
+            "type": "object",
+            "description": "Page range — Used with URL template: {\"from\": 1, \"to\": 10} and optionally \"step\" (e.g. 20 for offset-style URLs like ?start={page}). Inclusive; from defaults to 1. Example: {\"from\":1,\"to\":3}."
+          },
+          "maxPages": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100000,
+            "description": "Max pages — Optional. Total page cap when following links or reading sitemaps (default 100). Plain URL lists are not capped by this."
+          },
+          "sameDomainOnly": {
+            "type": "boolean",
+            "description": "Stay on the same domain — Only follow links on the same host as the page they were found on (default on)."
+          },
+          "includeMetadata": {
+            "type": "boolean",
+            "description": "Include page metadata — Add a \"metadata\" object to each row: title, description, canonical URL, language, Open Graph tags and parsed JSON-LD (schema.org) blocks."
+          },
+          "headers": {
+            "type": "object",
+            "description": "Request headers — Optional. Extra HTTP headers sent with every page request, e.g. {\"Accept-Language\": \"de-DE\", \"Authorization\": \"Bearer …\"}. A \"User-Agent\" here replaces the default one. Values are never written to the log."
+          },
+          "cookies": {
+            "type": "array",
+            "items": {},
+            "description": "Cookies — Optional. Cookies sent with every page request, as [\"name=value\", …] or the [{\"name\": …, \"value\": …}] list a browser cookie-export extension produces (domain and path are ignored). Values are never written to the log; a raw Cookie header can also go in Request headers."
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "urls",
+          "selectors"
+        ]
+      }
+    },
+    {
+      "name": "website_screenshot",
+      "description": "Generate full-page or viewport screenshots of websites in PNG or JPEG format. Fast, reliable screenshots with customizable viewport size, wait time, and element hiding. Billed to your own Apify account: ~$0.002 per screenshot (Apify free-plan price, lower on paid plans).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "urls": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^https?://.+"
+            },
+            "minItems": 1,
+            "description": "Website URLs — Array of website URLs to screenshot, e.g. ['https://example.com', 'https://google.com'] Example: [\"https://example.com\"]."
+          },
+          "fullPage": {
+            "type": "boolean",
+            "default": false,
+            "description": "Full Page Screenshot — Capture entire page height (clipped at 20,000 px to avoid giant images). Set false to capture only the viewport."
+          },
+          "format": {
+            "type": "string",
+            "enum": [
+              "png",
+              "jpeg"
+            ],
+            "default": "png",
+            "description": "Image Format — Output image format: 'png' or 'jpeg'"
+          },
+          "quality": {
+            "type": "integer",
+            "default": 80,
+            "minimum": 1,
+            "maximum": 100,
+            "description": "JPEG Quality — JPEG compression quality (1-100). Only used when format is 'jpeg'."
+          },
+          "viewportWidth": {
+            "type": "integer",
+            "default": 1280,
+            "minimum": 320,
+            "maximum": 3840,
+            "description": "Viewport Width — Browser viewport width in pixels"
+          },
+          "viewportHeight": {
+            "type": "integer",
+            "default": 800,
+            "minimum": 240,
+            "maximum": 2160,
+            "description": "Viewport Height — Browser viewport height in pixels"
+          },
+          "waitUntil": {
+            "type": "string",
+            "enum": [
+              "load",
+              "domcontentloaded",
+              "networkidle"
+            ],
+            "default": "load",
+            "description": "Wait Until Event — Page load event to wait for before taking screenshot"
+          },
+          "waitMs": {
+            "type": "integer",
+            "default": 1000,
+            "minimum": 0,
+            "maximum": 30000,
+            "description": "Additional Wait Time — Additional time to wait after page load event (milliseconds)"
+          },
+          "hideSelectors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "default": [],
+            "description": "Hide CSS Selectors — CSS selectors to hide before taking screenshot (e.g., ['.modal', '#cookiebanner'])"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "urls"
+        ]
+      }
+    }
+  ]
+}
