@@ -1,7 +1,7 @@
 # WebDataTools Domain & website intelligence MCP server
 `webdatatools-domain-mcp`
 
-An MCP server with 12 domain & website intelligence tools for AI agents — Claude Desktop, Cursor, Cline or any MCP client. WHOIS/RDAP, DNS and e-mail security (SPF, DKIM, DMARC), TLS and security headers, subdomains, tech stack, contacts, SEO, Core Web Vitals, sitemaps and Wayback page diffs for any domain.
+An MCP server with 13 domain & website intelligence tools for AI agents — Claude Desktop, Cursor, Cline or any MCP client. WHOIS/RDAP, DNS and e-mail security (SPF, DKIM, DMARC), TLS and security headers, subdomains, tech stack, contacts, SEO, Core Web Vitals, sitemaps and Wayback page diffs for any domain.
 
 **This server uses *your own* Apify API token.** Every tool call runs a [WebDataTools](https://apify.com/webdatatools) Actor under your Apify account and is billed to your Apify credit — pay per result, the price is in each tool description. Your token is only sent to Apify's API.
 
@@ -36,7 +36,7 @@ Add this to `claude_desktop_config.json` (Claude Desktop) or `.cursor/mcp.json` 
 }
 ```
 
-## Tools (12)
+## Tools (13)
 
 | Tool | What it does | Price (free plan) | Backing Actor |
 |---|---|---|---|
@@ -52,6 +52,7 @@ Add this to `claude_desktop_config.json` (Claude Desktop) or `.cursor/mcp.json` 
 | `domain_whois_rdap` | Bulk Domain WHOIS & RDAP Lookup | $0.003 / Domain | [Actor](https://apify.com/webdatatools/domain-whois-rdap) |
 | `css_selector_extractor` | Web Scraper — CSS Selector & Data Extractor | $0.002 / Page | [Actor](https://apify.com/webdatatools/css-selector-extractor) |
 | `website_screenshot` | Website Screenshot Generator | $0.002 / screenshot | [Actor](https://apify.com/webdatatools/website-screenshot) |
+| `css_selector_extractor_js` | CSS Selector Extractor for JavaScript Sites (Browser) | $0.003 / page | [Actor](https://apify.com/webdatatools/css-selector-extractor-js) |
 
 ## More WebDataTools MCP servers
 
