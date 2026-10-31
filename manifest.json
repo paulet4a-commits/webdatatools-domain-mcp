@@ -718,27 +718,14 @@
             "items": {
               "type": "string"
             },
-            "default": [
-              "https://quotes.toscrape.com/js/"
-            ],
-            "description": "URLs — Enter one URL per row. Each page is opened in a real Chromium browser, JavaScript runs, and the selectors are read from the rendered HTML. Each page gets exactly one result row, even if loading fails. Rows are saved as pages finish; if the run timeout comes first, the run stops early and still ends SUCCEEDED."
+            "description": "URLs — Enter one URL per row. Each page is opened in a real Chromium browser, JavaScript runs, and the selectors are read from the rendered HTML. Each page gets exactly one result row, even if loading fails. Rows are saved as pages finish; if the run timeout comes first, the run stops early and still ends SUCCEEDED. Example: [\"https://quotes.toscrape.com/js/\"].",
+            "minItems": 1
           },
           "selectors": {
             "type": "array",
             "items": {},
-            "default": [
-              {
-                "name": "text",
-                "selector": ".text",
-                "type": "text"
-              },
-              {
-                "name": "author",
-                "selector": ".author",
-                "type": "text"
-              }
-            ],
-            "description": "Selectors — Enter the fields to extract as a JSON array of {\"name\", \"selector\", \"type\"} objects, read from the rendered page. \"type\" is text, html, attr, count or table; \"attr\" also needs \"attribute\" (e.g. {\"name\":\"canonicalUrl\",\"selector\":\"link[rel='canonical']\",\"type\":\"attr\",\"attribute\":\"href\"}). \"table\" returns the matched <table> as an array of row objects keyed by its header row. Capped at 25 entries per run."
+            "description": "Selectors — Enter the fields to extract as a JSON array of {\"name\", \"selector\", \"type\"} objects, read from the rendered page. \"type\" is text, html, attr, count or table; \"attr\" also needs \"attribute\" (e.g. {\"name\":\"canonicalUrl\",\"selector\":\"link[rel='canonical']\",\"type\":\"attr\",\"attribute\":\"href\"}). \"table\" returns the matched <table> as an array of row objects keyed by its header row. Capped at 25 entries per run. Example: [{\"name\":\"text\",\"selector\":\".text\",\"type\":\"text\"},{\"name\":\"author\",\"selector\":\".author\",\"type\":\"text\"}].",
+            "minItems": 1
           },
           "firstMatchOnly": {
             "type": "boolean",
@@ -863,7 +850,11 @@
             "description": "Cookies — Optional. Cookies sent with every page request, as [\"name=value\", …] or the [{\"name\": …, \"value\": …}] list a browser cookie-export extension produces (domain and path are ignored). Values are never written to the log; a raw Cookie header can also go in Request headers."
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "required": [
+          "urls",
+          "selectors"
+        ]
       }
     }
   ]
