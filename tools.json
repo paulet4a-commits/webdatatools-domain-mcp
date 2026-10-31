@@ -895,5 +895,38 @@
     ],
     "urlSourceFields": [],
     "price": "$0.003 / page"
+  },
+  {
+    "name": "social_media_finder",
+    "actor": "webdatatools~social-media-finder",
+    "title": "Social Media Finder (Official Brand Profile Links)",
+    "description": "Social Media Finder reads a company or brand website and returns its official social profile links: Instagram, X, Facebook, LinkedIn company page, YouTube, TikTok, Pinterest and Threads. Uses the site itself (footer and schema.org sameAs links), no search engine. Billed to your own Apify account: ~$0.003 per Domain with social profiles (Apify free-plan price, lower on paid plans).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "domains": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Website domains — Company or brand website domains, one per line, e.g. shopify.com or hubspot.com. Only the domain is needed, not a full URL. Example: [\"shopify.com\"].",
+          "minItems": 1
+        },
+        "includeWithoutProfiles": {
+          "type": "boolean",
+          "default": true,
+          "description": "Return domains without social links — When on, every domain gets a row, including those where no social profile link was found (not charged)."
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "domains"
+      ]
+    },
+    "arrayFields": [
+      "domains"
+    ],
+    "urlSourceFields": [],
+    "price": "$0.003 / Domain with social profiles"
   }
 ]
